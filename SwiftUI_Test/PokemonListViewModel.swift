@@ -32,6 +32,7 @@ class PokemonListViewModel: ObservableObject {
     @Published var pokemon: PokemonDetail?
     @Published var errorMessage: String?
     @Published var result: Result?
+    @Published var pokemonDetails: [PokemonDetail] = []
     
     private var cancellables = Set<AnyCancellable>()
     private let api = PokemonAPI()
@@ -48,8 +49,28 @@ class PokemonListViewModel: ObservableObject {
             }, receiveValue: { result in
                 self.result = result
                 self.errorMessage = nil
+                self.fetchPokemonDetails()
             })
             .store(in: &cancellables)
+    }
+    
+    func fetchPokemonDetails() {
+        if let result = result {
+            for pokemon in result.results {
+                api.fetchPokemon(urlString: pokemon.url)
+                    .sink(receiveCompletion: { completion in
+                        switch completion {
+                        case .failure(let error):
+                            self.errorMessage = "エラー: \(error.localizedDescription)"
+                        case .finished:
+                            break
+                        }
+                    }, receiveValue: { pokemonDetail in
+                        self.pokemonDetails.append(pokemonDetail)
+                    })
+                    .store(in: &cancellables)
+            }
+        }
     }
     
     func fetchPokemon(id: Int) {

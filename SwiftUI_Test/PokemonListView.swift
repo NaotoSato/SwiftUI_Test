@@ -14,18 +14,15 @@ struct PokemonListView: View {
     var onDismiss: () -> Void
     
     var body: some View {
-        
         VStack {
             Text("ポケモン図鑑")
-            if let result = viewModel.result {
+            if (viewModel.pokemonDetails.isEmpty == false) {
+                let rows: [[PokemonDetail]] = viewModel.pokemonDetails.chunked(by: 3)
                 ScrollView(.vertical, showsIndicators: true) {
-                    Grid(alignment: .top, horizontalSpacing: 28, verticalSpacing: 32) {
-                        let rows = result.results.chunked(by: 3)
+                    Grid(alignment: .top, horizontalSpacing: 10, verticalSpacing: 10) {
                         ForEach(rows.enumerated().map({ $0 }), id: \.0) { index, row in
                             GridRow {
-                                ForEach(row, id: \.name) { pokemon in
-                                    Text(pokemon.name.capitalized)
-                                }
+                                createPokemonRow(row: row)
                             }
                         }
                     }
@@ -47,33 +44,38 @@ struct PokemonListView: View {
         .onAppear() {
             viewModel.fetchPokemonList()
         }
-        
-
-//        Button("検索") {
-//            viewModel.fetchPokemon(name: pokemonName)
-//        }
-//        .padding()
-//
-//        if let pokemon = viewModel.pokemon {
-//            VStack {
-//                Text("名前: \(pokemon.name.capitalized)")
-//                    .font(.title)
-//                if let imageUrl = pokemon.sprites.front_shiny, let url = URL(string: imageUrl) {
-//                    AsyncImage(url: url) { image in
-//                        image.resizable()
-//                            .scaledToFit()
-//                            .frame(width: 100, height: 100)
-//                    } placeholder: {
-//                        ProgressView()
-//                    }
-//                }
-//            }
-//        } else if let errorMessage = viewModel.errorMessage {
-//            Text(errorMessage)
-//                .foregroundColor(.red)
-//        }
     }
+    
+    func createPokemonRow(row: [PokemonDetail]) -> some View {
+        ForEach(row, id: \.name) { pokemon in
+            VStack {
+                Text(pokemon.name.capitalized)
+                    .font(.subheadline)
+                    .padding(.vertical)
+                if let imageUrl = pokemon.sprites.front_default, let url = URL(string: imageUrl) {
+                    AsyncImage(url: url) { image in
+                        image.resizable()
+                            .scaledToFit()
+                            .frame(width: 80, height: 80)
+                    } placeholder: {
+                        ProgressView()
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .background(.white)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(lineWidth: 2)
+            )
+            .cornerRadius(10)
+        }
+    }
+    
+    
 }
+
+
 
 #Preview {
     PokemonListView() {}
