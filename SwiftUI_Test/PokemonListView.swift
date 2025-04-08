@@ -17,10 +17,10 @@ struct PokemonListView: View {
         VStack {
             Text("ポケモン図鑑")
             if (viewModel.pokemonDetails.isEmpty == false) {
-                let rows: [[PokemonDetail]] = viewModel.pokemonDetails.chunked(by: 3)
+                let detailRows: [[PokemonDetail]] = viewModel.pokemonDetails.chunked(by: 3)
                 ScrollView(.vertical, showsIndicators: true) {
                     Grid(alignment: .top, horizontalSpacing: 10, verticalSpacing: 10) {
-                        ForEach(rows.enumerated().map({ $0 }), id: \.0) { index, row in
+                        ForEach(detailRows.enumerated().map({ $0 }), id: \.0) { index, row in
                             GridRow {
                                 createPokemonRow(row: row)
                             }

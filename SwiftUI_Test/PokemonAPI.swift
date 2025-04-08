@@ -52,6 +52,17 @@ class PokemonAPI {
             .eraseToAnyPublisher() // 返り値を統一する
     }
     
-    func fetchPokemonSpecies(name: String)
+    func fetchPokemonSpecies(name: String) -> AnyPublisher<PokemonSpecies, Error> {
+        let urlString = "\(baseURL)pokemon-species/\(name)"
+        guard let url = URL(string: urlString) else {
+            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+        }
+        
+        return URLSession.shared.dataTaskPublisher(for: url)
+            .map { $0.data } // レスポンスからデータを取り出す
+            .decode(type: PokemonSpecies.self, decoder: JSONDecoder()) // JSONデコード
+            .receive(on: DispatchQueue.main) // メインスレッドで受け取る
+            .eraseToAnyPublisher() // 返り値を統一する
+    }
     
 }
