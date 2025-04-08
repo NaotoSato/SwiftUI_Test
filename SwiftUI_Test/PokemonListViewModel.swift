@@ -47,15 +47,14 @@ struct PokemonLanguage: Decodable {
 }
 
 class PokemonListViewModel: ObservableObject {
-    @Published var pokemon: PokemonDetail?
     @Published var errorMessage: String?
-    @Published var result: Result?
     @Published var pokemonDetails: [PokemonDetail] = []
     
     private var cancellables = Set<AnyCancellable>()
     private let api = PokemonAPI()
     
     func fetchPokemonList(limit: Int = 20, offset: Int = 0) {
+        self.pokemonDetails = []
         api.fetchPokemonList(limit: limit, offset: offset)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -65,58 +64,43 @@ class PokemonListViewModel: ObservableObject {
                     break
                 }
             }, receiveValue: { result in
-                self.result = result
                 self.errorMessage = nil
-                self.fetchPokemonDetails()
+                self.fetchPokemonDetails(result: result)
             })
             .store(in: &cancellables)
     }
     
-    func fetchPokemonDetails() {
-        if let result = result {
-            for pokemon in result.results {
-                api.fetchPokemon(urlString: pokemon.url)
-                    .sink(receiveCompletion: { completion in
-                        switch completion {
-                        case .failure(let error):
-                            self.errorMessage = "エラー: \(error.localizedDescription)"
-                        case .finished:
-                            break
-                        }
-                    }, receiveValue: { pokemonDetail in
-                        self.fetchPokemonSpecies(name: pokemonDetail.name) { japaneseName in
-                            DispatchQueue.main.async {
-                                if let japaneseName = japaneseName {
-                                    // 日本語名が取得できた場合に上書き
-                                    var updatedPokemonDetail = pokemonDetail
-                                    updatedPokemonDetail.name = japaneseName
-                                    self.pokemonDetails.append(updatedPokemonDetail)
-                                } else {
-                                    // 日本語名が取得できない場合はそのまま追加
-                                    self.pokemonDetails.append(pokemonDetail)
-                                }
+    func fetchPokemonDetails(result: Result) {
+        for pokemon in result.results {
+            api.fetchPokemon(urlString: pokemon.url)
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .failure(let error):
+                        self.errorMessage = "エラー: \(error.localizedDescription)"
+                    case .finished:
+                        break
+                    }
+                }, receiveValue: { pokemonDetail in
+                    self.fetchPokemonSpecies(name: pokemonDetail.name) { japaneseName in
+                        DispatchQueue.main.async {
+                            if let japaneseName = japaneseName {
+                                // 日本語名が取得できた場合に上書き
+                                var updatedPokemonDetail = pokemonDetail
+                                updatedPokemonDetail.name = japaneseName
+                                self.pokemonDetails.append(updatedPokemonDetail)
+                                // 並び順がバラバラになることがあるのでソートしておく
+                                self.pokemonDetails.sort(by: {$0.id < $1.id})
+                            } else {
+                                // 日本語名が取得できない場合はそのまま追加
+                                self.pokemonDetails.append(pokemonDetail)
+                                // 並び順がバラバラになることがあるのでソートしておく
+                                self.pokemonDetails.sort(by: {$0.id < $1.id})
                             }
                         }
-                    })
-                    .store(in: &cancellables)
-            }
+                    }
+                })
+                .store(in: &cancellables)
         }
-    }
-    
-    func fetchPokemon(id: Int) {
-        api.fetchPokemon(id: id)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .failure(let error):
-                    self.errorMessage = "エラー: \(error.localizedDescription)"
-                case .finished:
-                    break
-                }
-            }, receiveValue: { pokemon in
-                self.pokemon = pokemon
-                self.errorMessage = nil
-            })
-            .store(in: &cancellables)
     }
     
     func fetchPokemonSpecies(name: String, _completion: @escaping (String?) -> Void) {

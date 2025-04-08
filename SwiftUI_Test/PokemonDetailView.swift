@@ -12,6 +12,7 @@ struct PokemonDetailView: View {
     
     var body: some View {
         VStack {
+            Text(String(pokemonDetail.id))
             Text(pokemonDetail.name)
                 .font(.largeTitle)
                 .padding()

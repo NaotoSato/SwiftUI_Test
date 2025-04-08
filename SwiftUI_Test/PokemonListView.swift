@@ -11,6 +11,9 @@ struct PokemonListView: View {
     @StateObject private var viewModel = PokemonListViewModel()
     let pokemonMaxId = 1300
     var onDismiss: () -> Void
+    @State var currentOffset = 0
+    let limit = 20
+    
     
     var body: some View {
         NavigationStack {
@@ -31,18 +34,37 @@ struct PokemonListView: View {
                     Text("エラー：\(errorMessage)")
                 }
                 
-                Button("閉じる") {
-                    onDismiss()
+                HStack {
+                    Button("前の20件") {
+                        if (currentOffset >= limit) {
+                            currentOffset -= limit
+                            viewModel.fetchPokemonList(offset: currentOffset)
+                        } else {
+                            // 何もしない
+                        }
+                        
+                    }
+                    .padding()
+                    
+                    Button("閉じる") {
+                        onDismiss()
+                    }
+                    .font(.headline)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .clipShape(Capsule())
+                    
+                    Button("次の20件") {
+                        currentOffset += limit
+                        viewModel.fetchPokemonList(offset: currentOffset)
+                    }
+                    .padding()
                 }
-                .font(.headline)
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .clipShape(Capsule())
             }
             .padding()
             .onAppear() {
-                viewModel.fetchPokemonList()
+                viewModel.fetchPokemonList(offset: currentOffset)
             }
         }
     }
@@ -51,6 +73,7 @@ struct PokemonListView: View {
         ForEach(row, id: \.name) { pokemonDetail in
             NavigationLink(destination: PokemonDetailView(pokemonDetail: pokemonDetail)) {
                 VStack {
+                    Text(String(pokemonDetail.id))
                     Text(pokemonDetail.name)
                         .font(.subheadline)
                         .padding(.vertical)
