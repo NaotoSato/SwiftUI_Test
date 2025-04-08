@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct PokemonDetailView: View {
     let pokemonDetail: PokemonDetail
@@ -17,7 +18,13 @@ struct PokemonDetailView: View {
                 .font(.largeTitle)
                 .padding()
             
-            if let imageUrl = pokemonDetail.sprites.front_default, let url = URL(string: imageUrl) {
+            if let gifUrl_2 = pokemonDetail.sprites.versions.generationV.blackWhite.animated.front_default, let url = URL(string: gifUrl_2) {
+                WebImage(url: url) // SDWebImageSwiftUI を使用
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 200, height: 200)
+            } else if let imageUrl = pokemonDetail.sprites.front_default, let url = URL(string: imageUrl) {
+                // gifが取得できなければ静止画を表示
                 AsyncImage(url: url) { image in
                     image.resizable()
                         .scaledToFit()

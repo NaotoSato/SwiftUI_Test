@@ -30,6 +30,40 @@ struct PokemonDetail: Decodable {
 
 struct Sprites: Decodable {
     let front_default: String? // ポケモンの画像URL
+    let other: OtherSprites
+    let versions: VersionSprites
+}
+
+struct OtherSprites: Decodable {
+    let showdown: ShowdownSprites
+}
+
+struct ShowdownSprites: Decodable {
+    let front_default: String?
+}
+
+struct VersionSprites: Decodable {
+    let generationV: GenerationVSprites
+    
+    enum CodingKeys: String, CodingKey {
+        case generationV = "generation-v"
+    }
+}
+
+struct GenerationVSprites: Decodable {
+    let blackWhite: BlackWhiteSprites
+    
+    enum CodingKeys: String, CodingKey {
+        case blackWhite = "black-white"
+    }
+}
+
+struct BlackWhiteSprites: Decodable {
+    let animated: AnimatedSprites
+}
+
+struct AnimatedSprites: Decodable {
+    let front_default: String?
 }
 
 struct PokemonSpecies: Decodable {
