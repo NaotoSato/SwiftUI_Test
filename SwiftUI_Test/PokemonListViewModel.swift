@@ -21,7 +21,10 @@ struct Pokemon: Decodable {
 }
 
 struct PokemonDetail: Decodable {
+    let id: Int
     var name: String // 日本語名に上書きしたいのでvarにしている
+    let height: Int
+    let weight: Int
     let sprites: Sprites
 }
 
