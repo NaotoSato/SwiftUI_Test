@@ -19,6 +19,11 @@ struct PokemonListView: View {
         NavigationStack {
             VStack {
                 Text("ポケモン図鑑")
+                    .font(.headline)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.originalLightGreen)
+                Spacer()
                 if (viewModel.pokemonDetails.isEmpty == false) {
                     let detailRows: [[PokemonDetail]] = viewModel.pokemonDetails.chunked(by: 3)
                     ScrollView(.vertical, showsIndicators: true) {
@@ -33,7 +38,7 @@ struct PokemonListView: View {
                 } else if let errorMessage = viewModel.errorMessage {
                     Text("エラー：\(errorMessage)")
                 }
-                
+                Spacer()
                 HStack {
                     Button("前の20件") {
                         // 前が存在する場合リストを切り替える

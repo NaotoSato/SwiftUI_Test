@@ -18,7 +18,7 @@ struct PokemonDetailView: View {
                 .font(.largeTitle)
                 .padding()
             
-            if let gifUrl_2 = pokemonDetail.sprites.versions.generationV.blackWhite.animated.front_default, let url = URL(string: gifUrl_2) {
+            if let gifUrl = pokemonDetail.sprites.versions.generationV.blackWhite.animated.front_default, let url = URL(string: gifUrl) {
                 WebImage(url: url) // SDWebImageSwiftUI を使用
                     .resizable()
                     .scaledToFit()

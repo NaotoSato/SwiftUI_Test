@@ -13,21 +13,39 @@ struct StartView: View {
     
     var body: some View {
         VStack {
-            Button("ポケモン図鑑") {
+            Button {
                 isShowingPokemonListView = true
+            } label: {
+                Text("ポケモン図鑑")
+                    .font(.headline)
+                    .frame(height: 48)
+                    .frame(maxWidth: .infinity)
             }
+            .buttonStyle(.plain)
+            .background(Color.originalLightGreen)
+            .cornerRadius(24)
             .fullScreenCover(isPresented: $isShowingPokemonListView) {
                 PokemonListView() {
                     isShowingPokemonListView = false
                 }
             }
+            .padding()
             
-            Button("動物クイズ") {
+            Button {
                 isShowingQuizView = true
+            } label: {
+                Text("動物クイズ")
+                    .font(.headline)
+                    .frame(height: 48)
+                    .frame(maxWidth: .infinity)
             }
+            .buttonStyle(.plain)
+            .background(Color.originalLightGreen)
+            .cornerRadius(24)
             .fullScreenCover(isPresented: $isShowingQuizView) {
                 QuizView()
             }
+            .padding()
 
         }
         .padding()
