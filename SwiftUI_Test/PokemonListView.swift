@@ -24,8 +24,8 @@ struct PokemonListView: View {
                     .frame(maxWidth: .infinity)
                     .background(Color.originalLightGreen)
                 Spacer()
-                if (viewModel.pokemonDetails.isEmpty == false) {
-                    let detailRows: [[PokemonDetail]] = viewModel.pokemonDetails.chunked(by: 3)
+                if (viewModel.pokemonDetailDtos.isEmpty == false) {
+                    let detailRows: [[PokemonDetailDto]] = viewModel.pokemonDetailDtos.chunked(by: 3)
                     ScrollView(.vertical, showsIndicators: true) {
                         Grid(alignment: .top, horizontalSpacing: 10, verticalSpacing: 10) {
                             ForEach(detailRows.enumerated().map({ $0 }), id: \.0) { index, row in
@@ -75,15 +75,15 @@ struct PokemonListView: View {
         }
     }
     
-    func createPokemonRow(row: [PokemonDetail]) -> some View {
-        ForEach(row, id: \.name) { pokemonDetail in
-            NavigationLink(destination: PokemonDetailView(pokemonDetail: pokemonDetail)) {
+    func createPokemonRow(row: [PokemonDetailDto]) -> some View {
+        ForEach(row, id: \.name) { pokemonDetailDto in
+            NavigationLink(destination: PokemonDetailView(pokemonDetailDto: pokemonDetailDto)) {
                 VStack {
-                    Text(String(pokemonDetail.id))
-                    Text(pokemonDetail.name)
+                    Text(String(pokemonDetailDto.id))
+                    Text(pokemonDetailDto.name)
                         .font(.subheadline)
                         .padding(.vertical)
-                    if let imageUrl = pokemonDetail.sprites.front_default, let url = URL(string: imageUrl) {
+                    if let imageUrl = pokemonDetailDto.sprites.front_default, let url = URL(string: imageUrl) {
                         AsyncImage(url: url) { image in
                             image.resizable()
                                 .scaledToFit()

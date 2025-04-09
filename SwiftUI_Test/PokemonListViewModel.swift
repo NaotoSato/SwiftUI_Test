@@ -22,10 +22,19 @@ struct Pokemon: Decodable {
 
 struct PokemonDetail: Decodable {
     let id: Int
-    var name: String // 日本語名に上書きしたいのでvarにしている
+    let name: String
     let height: Int
     let weight: Int
     let sprites: Sprites
+}
+
+struct PokemonDetailDto {
+    let id: Int
+    let name: String // 基本日本語。取得できなければ英語
+    let height: Int
+    let weight: Int
+    let sprites: Sprites
+    let genus: String
 }
 
 struct Sprites: Decodable {
@@ -68,11 +77,17 @@ struct AnimatedSprites: Decodable {
 
 struct PokemonSpecies: Decodable {
     let names: [PokemonName]
+    let genera: [PokemonGenera]
 }
 
 struct PokemonName: Decodable {
     let language: PokemonLanguage
     let name: String
+}
+
+struct PokemonGenera: Decodable {
+    let genus: String
+    let language: PokemonLanguage
 }
 
 struct PokemonLanguage: Decodable {
@@ -83,13 +98,14 @@ struct PokemonLanguage: Decodable {
 class PokemonListViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var pokemonDetails: [PokemonDetail] = []
+    @Published var pokemonDetailDtos: [PokemonDetailDto] = []
     @Published var totalCount: Int = 0
     
     private var cancellables = Set<AnyCancellable>()
     private let api = PokemonAPI()
     
     func fetchPokemonList(limit: Int = 20, offset: Int = 0) {
-        self.pokemonDetails = []
+        self.pokemonDetailDtos = []
         api.fetchPokemonList(limit: limit, offset: offset)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -117,21 +133,25 @@ class PokemonListViewModel: ObservableObject {
                         break
                     }
                 }, receiveValue: { pokemonDetail in
-                    self.fetchPokemonSpecies(name: pokemonDetail.name) { japaneseName in
+                    self.fetchPokemonSpecies(name: pokemonDetail.name) { pokemonSpecies in
                         DispatchQueue.main.async {
-                            if let japaneseName = japaneseName {
-                                // 日本語名が取得できた場合に上書き
-                                var updatedPokemonDetail = pokemonDetail
-                                updatedPokemonDetail.name = japaneseName
-                                self.pokemonDetails.append(updatedPokemonDetail)
-                                // 並び順がバラバラになることがあるのでソートしておく
-                                self.pokemonDetails.sort(by: {$0.id < $1.id})
-                            } else {
-                                // 日本語名が取得できない場合はそのまま追加
-                                self.pokemonDetails.append(pokemonDetail)
-                                // 並び順がバラバラになることがあるのでソートしておく
-                                self.pokemonDetails.sort(by: {$0.id < $1.id})
+                            var name = pokemonDetail.name
+                            var genus = ""
+                            if let pokemonSpecies = pokemonSpecies {
+                                // 日本語名の取得
+                                if let japaneseName = pokemonSpecies.names.first(where: { $0.language.name == "ja-Hrkt" }) {
+                                    name = japaneseName.name
+                                }
+                                // 日本語分類の取得
+                                if let japaneseGenus = pokemonSpecies.genera.first(where: { $0.language.name == "ja-Hrkt" }) {
+                                    genus = japaneseGenus.genus
+                                }
                             }
+                            // DTOに詰め込み直す
+                            let pokemonDetailDto = PokemonDetailDto(id: pokemonDetail.id, name: name, height: pokemonDetail.height, weight: pokemonDetail.weight, sprites: pokemonDetail.sprites, genus: genus)
+                            self.pokemonDetailDtos.append(pokemonDetailDto)
+                            // 並び順がバラバラになることがあるのでソートしておく
+                            self.pokemonDetailDtos.sort(by: {$0.id < $1.id})
                         }
                     }
                 })
@@ -139,7 +159,7 @@ class PokemonListViewModel: ObservableObject {
         }
     }
     
-    func fetchPokemonSpecies(name: String, _completion: @escaping (String?) -> Void) {
+    func fetchPokemonSpecies(name: String, _completion: @escaping (PokemonSpecies?) -> Void) {
         api.fetchPokemonSpecies(name: name)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -150,12 +170,7 @@ class PokemonListViewModel: ObservableObject {
                     break
                 }
             }, receiveValue: { pokemonSpecies in
-                if let japaneseName = pokemonSpecies.names.first(where: { $0.language.name == "ja-Hrkt" }) {
-                    _completion(japaneseName.name) // 日本語名をクロージャに渡す
-                } else {
-                    _completion(nil) // 該当する名前がない場合は nil を返す
-                }
-                self.errorMessage = nil
+                _completion(pokemonSpecies)
             })
             .store(in: &cancellables)
     }
