@@ -36,13 +36,11 @@ struct PokemonListView: View {
                 
                 HStack {
                     Button("前の20件") {
+                        // 前が存在する場合リストを切り替える
                         if (currentOffset >= limit) {
                             currentOffset -= limit
                             viewModel.fetchPokemonList(offset: currentOffset)
-                        } else {
-                            // 何もしない
                         }
-                        
                     }
                     .padding()
                     
@@ -56,8 +54,11 @@ struct PokemonListView: View {
                     .clipShape(Capsule())
                     
                     Button("次の20件") {
-                        currentOffset += limit
-                        viewModel.fetchPokemonList(offset: currentOffset)
+                        // 次が存在する場合リストを切り替える
+                        if (viewModel.totalCount > 0 && (viewModel.totalCount / limit) * limit > currentOffset) {
+                            currentOffset += limit
+                            viewModel.fetchPokemonList(offset: currentOffset)
+                        }
                     }
                     .padding()
                 }

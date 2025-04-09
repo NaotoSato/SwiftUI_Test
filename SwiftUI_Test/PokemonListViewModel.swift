@@ -83,6 +83,7 @@ struct PokemonLanguage: Decodable {
 class PokemonListViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var pokemonDetails: [PokemonDetail] = []
+    @Published var totalCount: Int = 0
     
     private var cancellables = Set<AnyCancellable>()
     private let api = PokemonAPI()
@@ -98,6 +99,7 @@ class PokemonListViewModel: ObservableObject {
                     break
                 }
             }, receiveValue: { result in
+                self.totalCount = result.count
                 self.errorMessage = nil
                 self.fetchPokemonDetails(result: result)
             })
