@@ -13,7 +13,7 @@ struct PokemonDetailView: View {
     
     var body: some View {
         VStack {
-            Text(String(pokemonDetailDto.id))
+            Text("No.\(String(pokemonDetailDto.id))")
             Text(pokemonDetailDto.name)
                 .font(.largeTitle)
                 .padding()
@@ -33,11 +33,14 @@ struct PokemonDetailView: View {
                     ProgressView()
                 }
             }
-            Text("分類：\(pokemonDetailDto.genus)")
+            Text(pokemonDetailDto.genus)
+                .padding()
             let height = Double(pokemonDetailDto.height) * 0.1 // メートルにするため0.1かける
             let weight = Double(pokemonDetailDto.weight) * 0.1 // キログラムにするため0.1かける
-            Text("身長：\(String(format: "%.1f", height))m") // 小数第一位まで表示
-            Text("体重：\(String(format: "%.1f", weight))kg") // 小数第一位まで表示
+            Text("たかさ：\(String(format: "%.1f", height))m") // 小数第一位まで表示
+            Text("おもさ：\(String(format: "%.1f", weight))kg") // 小数第一位まで表示
+            Text(pokemonDetailDto.flavorText)
+                .padding()
             
             Spacer()
         }

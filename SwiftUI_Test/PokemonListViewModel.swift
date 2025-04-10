@@ -35,6 +35,7 @@ struct PokemonDetailDto {
     let weight: Int
     let sprites: Sprites
     let genus: String
+    let flavorText: String
 }
 
 struct Sprites: Decodable {
@@ -78,6 +79,7 @@ struct AnimatedSprites: Decodable {
 struct PokemonSpecies: Decodable {
     let names: [PokemonName]
     let genera: [PokemonGenera]
+    let flavor_text_entries: [PokemonFlavorText]
 }
 
 struct PokemonName: Decodable {
@@ -87,6 +89,11 @@ struct PokemonName: Decodable {
 
 struct PokemonGenera: Decodable {
     let genus: String
+    let language: PokemonLanguage
+}
+
+struct PokemonFlavorText: Decodable {
+    let flavor_text: String
     let language: PokemonLanguage
 }
 
@@ -137,6 +144,7 @@ class PokemonListViewModel: ObservableObject {
                         DispatchQueue.main.async {
                             var name = pokemonDetail.name
                             var genus = ""
+                            var flavorText = ""
                             if let pokemonSpecies = pokemonSpecies {
                                 // 日本語名の取得
                                 if let japaneseName = pokemonSpecies.names.first(where: { $0.language.name == "ja-Hrkt" }) {
@@ -146,9 +154,13 @@ class PokemonListViewModel: ObservableObject {
                                 if let japaneseGenus = pokemonSpecies.genera.first(where: { $0.language.name == "ja-Hrkt" }) {
                                     genus = japaneseGenus.genus
                                 }
+                                // 日本語説明文の取得
+                                if let japaneseFlavorText = pokemonSpecies.flavor_text_entries.first(where: { $0.language.name == "ja-Hrkt" }) {
+                                    flavorText = japaneseFlavorText.flavor_text
+                                }
                             }
                             // DTOに詰め込み直す
-                            let pokemonDetailDto = PokemonDetailDto(id: pokemonDetail.id, name: name, height: pokemonDetail.height, weight: pokemonDetail.weight, sprites: pokemonDetail.sprites, genus: genus)
+                            let pokemonDetailDto = PokemonDetailDto(id: pokemonDetail.id, name: name, height: pokemonDetail.height, weight: pokemonDetail.weight, sprites: pokemonDetail.sprites, genus: genus, flavorText: flavorText)
                             self.pokemonDetailDtos.append(pokemonDetailDto)
                             // 並び順がバラバラになることがあるのでソートしておく
                             self.pokemonDetailDtos.sort(by: {$0.id < $1.id})
