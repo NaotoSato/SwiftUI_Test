@@ -14,6 +14,14 @@ struct PokemonDetailView: View {
     var body: some View {
         VStack {
             Text("No.\(String(pokemonDetailDto.id))")
+            HStack {
+                ForEach(pokemonDetailDto.types, id: \.self) { _type in
+                    Text(_type.name)
+                        .font(.headline)
+                        .frame(width: 100, height: 30)
+                        .background(_type.color, in: RoundedRectangle(cornerRadius: 10))
+                }
+            }
             Text(pokemonDetailDto.name)
                 .font(.largeTitle)
                 .padding()

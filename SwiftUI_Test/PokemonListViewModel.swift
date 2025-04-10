@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import SwiftUI
 
 struct Result: Decodable {
     let count: Int
@@ -26,6 +27,7 @@ struct PokemonDetail: Decodable {
     let height: Int
     let weight: Int
     let sprites: Sprites
+    let types: [Types]
 }
 
 struct PokemonDetailDto {
@@ -34,8 +36,19 @@ struct PokemonDetailDto {
     let height: Int
     let weight: Int
     let sprites: Sprites
+    let types: [PokemonListViewModel.TypeKind]
     let genus: String
     let flavorText: String
+}
+
+struct Types: Decodable {
+    let slot: Int
+    let type: _Type
+}
+
+struct _Type: Decodable {
+    let name: String
+    let url: String
 }
 
 struct Sprites: Decodable {
@@ -103,6 +116,56 @@ struct PokemonLanguage: Decodable {
 }
 
 class PokemonListViewModel: ObservableObject {
+    // ポケモンのタイプ
+    enum TypeKind: String {
+        case normal, fighting, flying, poison, ground, rock, bug, ghost, steel, fire, water, grass, electric, psychic, ice, dragon, dark, fairy
+        
+        var name: String {
+            switch self {
+                case TypeKind.normal:
+                    return "ノーマル"
+                case .fighting:
+                    return "かくとう"
+                case .flying:
+                    return "ひこう"
+                case .poison:
+                    return "どく"
+                case .ground:
+                    return "じめん"
+                case .rock:
+                    return "いわ"
+                case .bug:
+                    return "むし"
+                case .ghost:
+                    return "ゴースト"
+                case .steel:
+                    return "はがね"
+                case .fire:
+                    return "ほのお"
+                case .water:
+                    return "みず"
+                case .grass:
+                    return "くさ"
+                case .electric:
+                    return "でんき"
+                case .psychic:
+                    return "エスパー"
+                case .ice:
+                    return "こおり"
+                case .dragon:
+                    return "ドラゴン"
+                case .fairy:
+                    return "フェアリー"
+                default:
+                    return ""
+            }
+        }
+        
+        var color: Color {
+            Color(self.rawValue)
+        }
+    }
+    
     @Published var errorMessage: String?
     @Published var pokemonDetails: [PokemonDetail] = []
     @Published var pokemonDetailDtos: [PokemonDetailDto] = []
@@ -159,8 +222,10 @@ class PokemonListViewModel: ObservableObject {
                                     flavorText = japaneseFlavorText.flavor_text
                                 }
                             }
+                            // タイプ
+                            let types = pokemonDetail.types.compactMap { TypeKind(rawValue: $0.type.name) }
                             // DTOに詰め込み直す
-                            let pokemonDetailDto = PokemonDetailDto(id: pokemonDetail.id, name: name, height: pokemonDetail.height, weight: pokemonDetail.weight, sprites: pokemonDetail.sprites, genus: genus, flavorText: flavorText)
+                            let pokemonDetailDto = PokemonDetailDto(id: pokemonDetail.id, name: name, height: pokemonDetail.height, weight: pokemonDetail.weight, sprites: pokemonDetail.sprites, types: types, genus: genus, flavorText: flavorText)
                             self.pokemonDetailDtos.append(pokemonDetailDto)
                             // 並び順がバラバラになることがあるのでソートしておく
                             self.pokemonDetailDtos.sort(by: {$0.id < $1.id})
