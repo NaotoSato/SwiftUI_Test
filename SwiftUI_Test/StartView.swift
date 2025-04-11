@@ -34,7 +34,7 @@ struct StartView: View {
             Button {
                 isShowingQuizView = true
             } label: {
-                Text("動物クイズ")
+                Text("動物クイズ(SwiftUIチュートリアル)")
                     .font(.headline)
                     .frame(height: 48)
                     .frame(maxWidth: .infinity)
