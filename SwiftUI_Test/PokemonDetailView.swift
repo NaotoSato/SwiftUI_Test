@@ -14,20 +14,30 @@ struct PokemonDetailView: View {
     // カードの外側の枠
     var outsideFrame: some View {
         Rectangle()
-            .foregroundColor(.originalGray)
-            .frame(width: 340, height: 590) // 高さを調整して2つの四角を統合
-            .border(Color.black, width: 1)
-            .cornerRadius(10)
+            .frame(width: 340, height: 590)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.gray, lineWidth: 1)
+                    .fill(.originalGray)
+            )
+            .mask {
+                RoundedRectangle(cornerRadius: 10)
+            }
             .shadow(radius: 3, x: 10, y: 10)
     }
     
     // カードの内側の枠
     var insideFrame: some View {
         Rectangle()
-            .foregroundColor(pokemonDetailDto.types.first?.color ?? .white)
-            .frame(width: 320, height: 570) // 高さを調整して2つの四角を統合
-            .border(Color.black, width: 1)
-            .cornerRadius(10)
+            .frame(width: 320, height: 570)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.gray, lineWidth: 1)
+                    .fill(pokemonDetailDto.types.first?.color ?? .white)
+            )
+            .mask {
+                RoundedRectangle(cornerRadius: 10)
+            }
     }
     
     // ポケモン画像
@@ -55,10 +65,15 @@ struct PokemonDetailView: View {
     var pokemonInfo: some View {
         ZStack {
             Rectangle()
-                .foregroundColor(.white)
                 .frame(width: 320, height: 160)
-                .border(Color.black, width: 1)
-                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.gray, lineWidth: 1)
+                        .fill(.white)
+                )
+                .mask {
+                    RoundedRectangle(cornerRadius: 10)
+                }
             
             VStack {
                 HStack {
