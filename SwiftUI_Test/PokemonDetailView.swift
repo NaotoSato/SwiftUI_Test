@@ -91,7 +91,7 @@ struct PokemonDetailView: View {
                 HStack {
                     // 名前
                     Text(pokemonDetailDto.name)
-                        .font(.headline)
+                        .font(.system(size: 20, weight: .black, design: .default))
                         .padding()
                     Spacer()
                     // タイプ
