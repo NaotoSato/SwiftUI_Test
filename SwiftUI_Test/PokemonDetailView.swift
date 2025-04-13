@@ -14,7 +14,7 @@ struct PokemonDetailView: View {
     // カードの外側の枠
     var outsideFrame: some View {
         Rectangle()
-            .frame(width: 340, height: 590)
+            .frame(width: 340, height: 540)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.gray, lineWidth: 1)
@@ -28,16 +28,28 @@ struct PokemonDetailView: View {
     
     // カードの内側の枠
     var insideFrame: some View {
-        Rectangle()
-            .frame(width: 320, height: 570)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray, lineWidth: 1)
-                    .fill(pokemonDetailDto.types.first?.color ?? .white)
-            )
-            .mask {
-                RoundedRectangle(cornerRadius: 10)
-            }
+        ZStack(alignment: .bottom) {
+            Rectangle()
+                .frame(width: 320, height: 520)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.gray, lineWidth: 1)
+                        .fill(pokemonDetailDto.types.first?.color ?? .white)
+                )
+                .mask {
+                    RoundedRectangle(cornerRadius: 10)
+                }
+            // ポケモン情報
+            pokemonInfo
+        }
+    }
+    
+    //　カード台紙
+    var cardBoard: some View {
+        ZStack {
+            outsideFrame
+            insideFrame
+        }
     }
     
     // ポケモン画像
@@ -112,21 +124,13 @@ struct PokemonDetailView: View {
     }
     
     var body: some View {
-        ZStack {
-            // カードの外側の枠
-            outsideFrame
+        ZStack(alignment: .top) {
+            // カード台紙
+            cardBoard
             
-            // カードの内側の枠
-            insideFrame
-            
-            
-            VStack {
-                // ポケモン画像
-                pokemonImage
-                
-                // ポケモン情報
-                pokemonInfo
-            }
+            // ポケモン画像
+            pokemonImage
+                .offset(y: -40) // 少し上にずらす
         }
         .navigationTitle("詳細情報")
     }
