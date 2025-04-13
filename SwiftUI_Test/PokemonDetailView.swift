@@ -132,6 +132,7 @@ struct PokemonDetailView: View {
             pokemonImage
                 .offset(y: -40) // 少し上にずらす
         }
+        .pokemonBackground()
         .navigationTitle("詳細情報")
     }
 }

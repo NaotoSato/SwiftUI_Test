@@ -21,14 +21,12 @@ struct StartView: View {
                     .frame(height: 48)
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.plain)
-            .background(Color.originalLightGreen)
-            .cornerRadius(24)
             .fullScreenCover(isPresented: $isShowingPokemonListView) {
                 PokemonListView() {
                     isShowingPokemonListView = false
                 }
             }
+            .pokemonButtonStyle()
             .padding()
             
             Button {
@@ -39,16 +37,14 @@ struct StartView: View {
                     .frame(height: 48)
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.plain)
-            .background(Color.originalLightGreen)
-            .cornerRadius(24)
             .fullScreenCover(isPresented: $isShowingQuizView) {
                 QuizView()
             }
+            .pokemonButtonStyle()
             .padding()
 
         }
-        .padding()
+        .pokemonBackground()
     }
 }
 

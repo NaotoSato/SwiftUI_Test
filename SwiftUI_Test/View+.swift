@@ -25,4 +25,24 @@ extension View {
                     .padding(-3)
             )
     }
+    
+    @ViewBuilder
+    func pokemonBackground() -> some View {
+        let background = LinearGradient(gradient: Gradient(colors: [Color.originalPurple1, Color.originalPurple2]), startPoint: .top, endPoint: .bottom)
+        self
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                background
+                    .ignoresSafeArea()
+            )
+    }
+    
+    @ViewBuilder
+    func pokemonButtonStyle() -> some View {
+        self
+            .buttonStyle(.plain)
+            .background(Color.white)
+            .cornerRadius(24)
+            .shadow(radius: 10)
+    }
 }
